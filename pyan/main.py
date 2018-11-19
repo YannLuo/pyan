@@ -77,7 +77,7 @@ def main():
                       help="annotate with module and source line number")
 
     options, args = parser.parse_args()
-    filenames = [fn2 for fn in args for fn2 in glob(fn)]
+    filenames = [fn2 for fn in args for fn2 in glob(fn, recursive=True)]
     if len(args) == 0:
         parser.error('Need one or more filenames to process')
 

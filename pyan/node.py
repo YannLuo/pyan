@@ -131,7 +131,7 @@ class Node:
         if self.namespace == '':
             return self.name
         elif self.namespace is None:
-            return '*.' + self.name
+            return '*.' + (self.name or '')
         else:
             return self.namespace + '.' + self.name
 

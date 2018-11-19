@@ -151,7 +151,7 @@ class CallGraphVisitor(ast.NodeVisitor):
         self.expand_unknowns()
         self.contract_nonexistents()
         self.cull_inherited()
-        self.collapse_inner()
+        # self.collapse_inner()
 
     ###########################################################################
     # visitor methods
@@ -300,7 +300,8 @@ class CallGraphVisitor(ast.NodeVisitor):
         for d in node.args.defaults:
             self.visit(d)
         for d in node.args.kw_defaults:
-            self.visit(d)
+            if d:
+                self.visit(d)
         for stmt in node.body:
             self.visit(stmt)
 
@@ -315,12 +316,12 @@ class CallGraphVisitor(ast.NodeVisitor):
 
     def visit_Lambda(self, node):
         self.logger.debug("Lambda")
-        with ExecuteInInnerScope(self, "lambda"):
-            for d in node.args.defaults:
-                self.visit(d)
-            for d in node.args.kw_defaults:
-                self.visit(d)
-            self.visit(node.body)  # single expr
+        # with ExecuteInInnerScope(self, "lambda"):
+        #     for d in node.args.defaults:
+        #         self.visit(d)
+        #     for d in node.args.kw_defaults:
+        #         self.visit(d)
+        #     self.visit(node.body)  # single expr
 
     def visit_Import(self, node):
         self.logger.debug("Import %s" % [format_alias(x) for x in node.names])
@@ -536,7 +537,8 @@ class CallGraphVisitor(ast.NodeVisitor):
             self.analyze_binding(targets, values)
 
     def visit_AnnAssign(self, node):
-        self.visit_Assign(self, node)  # TODO: alias for now; add the annotations to output in a future version?
+        self.generic_visit(node)
+        # self.visit_Assign(node)  # TODO: alias for now; add the annotations to output in a future version?
 
     def visit_AugAssign(self, node):
         targets = sanitize_exprs(node.target)
@@ -573,9 +575,9 @@ class CallGraphVisitor(ast.NodeVisitor):
 
     def visit_ListComp(self, node):
         self.logger.debug("ListComp")
-        with ExecuteInInnerScope(self, "listcomp"):
-            self.visit(node.elt)
-            self.analyze_generators(node.generators)
+        # with ExecuteInInnerScope(self, "listcomp"):
+        #     self.visit(node.elt)
+        #     self.analyze_generators(node.generators)
 
     def visit_SetComp(self, node):
         self.logger.debug("SetComp")
@@ -1318,7 +1320,7 @@ class CallGraphVisitor(ast.NodeVisitor):
 
         # Keep wildcard if the target is actually an unresolved argument
         # (see visit_FunctionDef())
-        if to_node.get_name().find("^^^argument^^^") != -1:
+        if to_node.get_name() and to_node.get_name().find("^^^argument^^^") != -1:
             return
 
         # Here we may prefer to err in one of two ways:
