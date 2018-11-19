@@ -242,18 +242,19 @@ class VisualGraph(object):
                                         nodes_dict[n2],
                                         'defines',
                                         color))
-
         if draw_uses:
             color = "#000000"
-            for n in visitor.uses_edges:
-                if n.defined:
-                    for n2 in visitor.uses_edges[n]:
-                        if n2.defined:
-                            root_graph.edges.append(
-                                    VisualEdge(
-                                        nodes_dict[n],
-                                        nodes_dict[n2],
-                                        'uses',
-                                        color))
+            with open('use_graph.txt', 'w', encoding='utf-8') as wf:
+                for n in visitor.uses_edges:
+                    if n.defined:
+                        for n2 in visitor.uses_edges[n]:
+                            if n2.defined:
+                                root_graph.edges.append(
+                                        VisualEdge(
+                                            nodes_dict[n],
+                                            nodes_dict[n2],
+                                            'uses',
+                                            color))
+                                wf.write(f'{n.namespace} {n.name} {n2.namespace} {n2.name}\n')
 
         return root_graph

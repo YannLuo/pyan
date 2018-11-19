@@ -1,1 +1,1 @@
-python pyan.py REPOS\\pandas\\pandas\\**\\*.py -v -a --dot -f tmp.dot 2>tmp.log
+python pyan.py REPOS\\pydantic\\pydantic\\**\\*.py -v -a --dot -f tmp.dot 2>tmp.log
