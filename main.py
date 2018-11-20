@@ -14,5 +14,6 @@ def main():
     graph = VisualGraph.dump_callgraph(v)
     pprint(graph)
 
+
 if __name__ == '__main__':
     main()

@@ -5,7 +5,7 @@
 import re
 import logging
 import colorsys
-from pyan.node import Flavor
+from .node import Flavor
 from collections import defaultdict
 
 # Set node color by filename.
