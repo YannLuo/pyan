@@ -9,6 +9,7 @@
     for rendering by e.g. GraphViz or yEd.
 """
 
+import os
 import logging
 from glob import glob
 from optparse import OptionParser  # TODO: migrate to argparse
@@ -78,6 +79,7 @@ def main():
 
     options, args = parser.parse_args()
     filenames = [fn2 for fn in args for fn2 in glob(fn, recursive=True)]
+    filenames = list(filter(lambda filename: (os.path.sep + 'tests' + os.path.sep) not in filename and (os.path.sep + 'testing' + os.path.sep) not in filename, filenames))
     if len(args) == 0:
         parser.error('Need one or more filenames to process')
 

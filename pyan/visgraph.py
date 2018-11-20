@@ -5,6 +5,8 @@
 import re
 import logging
 import colorsys
+from pyan.node import Flavor
+from collections import defaultdict
 
 # Set node color by filename.
 #
@@ -14,6 +16,18 @@ import colorsys
 # level is 0, its lightness will be 1.0, i.e. pure white regardless
 # of the hue.
 #
+
+
+class ICall(object):
+    def __init__(self, namespace, name, flavor):
+        self.namespace = namespace
+        self.name = name
+        self.flavor = flavor
+
+    def __str__(self):
+        return f'{self.namespace} {self.name} {self.flavor}'
+
+
 class Colorizer:
     def __init__(self, num_colors, colored=True, logger=None):
         self.logger = logger or logging.getLogger(__name__)
@@ -242,19 +256,29 @@ class VisualGraph(object):
                                         nodes_dict[n2],
                                         'defines',
                                         color))
+
         if draw_uses:
             color = "#000000"
-            with open('use_graph.txt', 'w', encoding='utf-8') as wf:
-                for n in visitor.uses_edges:
-                    if n.defined:
-                        for n2 in visitor.uses_edges[n]:
-                            if n2.defined:
-                                root_graph.edges.append(
-                                        VisualEdge(
-                                            nodes_dict[n],
-                                            nodes_dict[n2],
-                                            'uses',
-                                            color))
-                                wf.write(f'{n.namespace} {n.name} {n2.namespace} {n2.name}\n')
-
+            for n in visitor.uses_edges:
+                if n.defined and n.flavor not in [Flavor.CLASS, Flavor.NAMESPACE, Flavor.MODULE]:
+                    for n2 in visitor.uses_edges[n]:
+                        if n2.defined and n2.flavor not in [Flavor.CLASS, Flavor.NAMESPACE, Flavor.MODULE]:
+                            root_graph.edges.append(
+                                    VisualEdge(
+                                        nodes_dict[n],
+                                        nodes_dict[n2],
+                                        'uses',
+                                        color))
         return root_graph
+
+    @classmethod
+    def dump_callgraph(cls, visitor, options=None, logger=None):
+        call_graph = defaultdict(list)
+        for n in visitor.uses_edges:
+            if n.defined and n.flavor not in [Flavor.CLASS, Flavor.NAMESPACE, Flavor.MODULE]:
+                for n2 in visitor.uses_edges[n]:
+                    if n2.defined and n2.flavor not in [Flavor.CLASS, Flavor.NAMESPACE, Flavor.MODULE]:
+                        caller = ICall(n.namespace, n.name, n.flavor)
+                        callee = ICall(n2.namespace, n2.name, n2.flavor)
+                        call_graph[str(caller)].append(callee)
+        return call_graph
