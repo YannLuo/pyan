@@ -7,13 +7,12 @@ import os
 
 
 def main():
-    repo_path = ['REPOS\\pydantic\\pydantic\\**\\*.py']
-    filenames = [fn2 for fn in repo_path for fn2 in glob(fn, recursive=True)]
+    repo_path = 'REPOS\\pydantic\\pydantic\\**\\*.py'
+    filenames = [fn for fn in glob(repo_path, recursive=True)]
     filenames = list(filter(lambda filename: (os.path.sep + 'tests' + os.path.sep) not in filename and (os.path.sep + 'testing' + os.path.sep) not in filename, filenames))
-    logger = logging.getLogger(__name__)
-    v = CallGraphVisitor(filenames, logger)
+    v = CallGraphVisitor(filenames)
     graph = VisualGraph.dump_callgraph(v)
-    print(graph)
+    pprint(graph)
 
 if __name__ == '__main__':
     main()

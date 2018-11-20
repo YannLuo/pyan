@@ -27,6 +27,9 @@ class ICall(object):
     def __str__(self):
         return f'{self.namespace} {self.name} {self.flavor}'
 
+    def __repr__(self):
+        return f'{self.namespace} {self.name} {self.flavor}'
+
 
 class Colorizer:
     def __init__(self, num_colors, colored=True, logger=None):
