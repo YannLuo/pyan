@@ -7,12 +7,11 @@ import os
 
 
 def main():
-    repo_path = 'REPOS\\pydantic\\pydantic\\**\\*.py'
-    filenames = [fn for fn in glob(repo_path, recursive=True)]
+    repo_paths = ['ecosystem\\**\\*.py']
+    filenames = [fn for repo_path in repo_paths for fn in glob(repo_path, recursive=True)]
     filenames = list(filter(lambda filename: (os.path.sep + 'tests' + os.path.sep) not in filename and (os.path.sep + 'testing' + os.path.sep) not in filename, filenames))
     v = CallGraphVisitor(filenames)
     graph = VisualGraph.dump_callgraph(v)
-    pprint(graph)
 
 
 if __name__ == '__main__':
